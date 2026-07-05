@@ -32,6 +32,10 @@ const openAPISpec = `{
   },
   "servers": [
     {
+      "url": "https://emailcheck.halukaksoy.dev",
+      "description": "Production"
+    },
+    {
       "url": "/",
       "description": "Current host"
     }

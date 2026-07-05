@@ -15,6 +15,10 @@ The API listens on `http://localhost:8183`.
 Scalar API documentation is available at `http://localhost:8183/`.
 The OpenAPI document is available at `http://localhost:8183/openapi.json`.
 
+Production will be available at `https://emailcheck.halukaksoy.dev`.
+Production Scalar API documentation will be available at `https://emailcheck.halukaksoy.dev/`.
+Production OpenAPI document will be available at `https://emailcheck.halukaksoy.dev/openapi.json`.
+
 > Reacher performs SMTP checks, so the host running Docker needs outbound SMTP access, including port 25, for full verification behavior.
 
 ## Endpoints
@@ -25,10 +29,24 @@ The OpenAPI document is available at `http://localhost:8183/openapi.json`.
 curl http://localhost:8183/healthz
 ```
 
+Production:
+
+```sh
+curl https://emailcheck.halukaksoy.dev/healthz
+```
+
 ### `POST /v1/check`
 
 ```sh
 curl -X POST http://localhost:8183/v1/check \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"someone@gmail.com"}'
+```
+
+Production:
+
+```sh
+curl -X POST https://emailcheck.halukaksoy.dev/v1/check \
   -H 'Content-Type: application/json' \
   -d '{"email":"someone@gmail.com"}'
 ```
@@ -53,6 +71,14 @@ Response:
 
 ```sh
 curl -X POST http://localhost:8183/v1/check/batch \
+  -H 'Content-Type: application/json' \
+  -d '{"emails":["first@example.com","second@example.com"]}'
+```
+
+Production:
+
+```sh
+curl -X POST https://emailcheck.halukaksoy.dev/v1/check/batch \
   -H 'Content-Type: application/json' \
   -d '{"emails":["first@example.com","second@example.com"]}'
 ```
