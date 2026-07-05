@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    environment:
+      PORT: "8080"
+      REACHER_BACKEND_URL: "http://reacher:8080"
+      HTTP_TIMEOUT_SECONDS: "120"
+      MAX_BATCH_SIZE: "25"
+      RATE_LIMIT_PER_MINUTE: "60"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - reacher
+
+  reacher:
+    image: reacherhq/backend:latest
+    expose:
+      - "8080"
