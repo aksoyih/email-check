@@ -10,10 +10,10 @@ The upstream backend runs as `reacherhq/backend:latest` and exposes `POST /v0/ch
 docker compose up --build
 ```
 
-The API listens on `http://localhost:8080`.
+The API listens on `http://localhost:8183`.
 
-Scalar API documentation is available at `http://localhost:8080/`.
-The OpenAPI document is available at `http://localhost:8080/openapi.json`.
+Scalar API documentation is available at `http://localhost:8183/`.
+The OpenAPI document is available at `http://localhost:8183/openapi.json`.
 
 > Reacher performs SMTP checks, so the host running Docker needs outbound SMTP access, including port 25, for full verification behavior.
 
@@ -22,13 +22,13 @@ The OpenAPI document is available at `http://localhost:8080/openapi.json`.
 ### `GET /healthz`
 
 ```sh
-curl http://localhost:8080/healthz
+curl http://localhost:8183/healthz
 ```
 
 ### `POST /v1/check`
 
 ```sh
-curl -X POST http://localhost:8080/v1/check \
+curl -X POST http://localhost:8183/v1/check \
   -H 'Content-Type: application/json' \
   -d '{"email":"someone@gmail.com"}'
 ```
@@ -52,7 +52,7 @@ Response:
 ### `POST /v1/check/batch`
 
 ```sh
-curl -X POST http://localhost:8080/v1/check/batch \
+curl -X POST http://localhost:8183/v1/check/batch \
   -H 'Content-Type: application/json' \
   -d '{"emails":["first@example.com","second@example.com"]}'
 ```
