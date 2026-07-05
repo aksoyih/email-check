@@ -91,7 +91,7 @@ Both check endpoints accept Reacher's optional SOCKS5 proxy payload:
 | --- | --- | --- |
 | `PORT` | `8080` | API port inside the container. |
 | `REACHER_BACKEND_URL` | `http://reacher:8080` | Base URL for the Reacher backend. |
-| `HTTP_TIMEOUT_SECONDS` | `120` | Timeout for calls to Reacher. |
+| `HTTP_TIMEOUT_SECONDS` | `30` | Timeout for calls to Reacher. |
 | `MAX_BATCH_SIZE` | `25` | Maximum number of emails accepted by `/v1/check/batch`. |
 | `RATE_LIMIT_PER_MINUTE` | `60` | Maximum requests per fixed one-minute window per IP. |
 

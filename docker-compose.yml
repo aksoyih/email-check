@@ -4,7 +4,7 @@ services:
     environment:
       PORT: "8080"
       REACHER_BACKEND_URL: "http://reacher:8080"
-      HTTP_TIMEOUT_SECONDS: "120"
+      HTTP_TIMEOUT_SECONDS: "30"
       MAX_BATCH_SIZE: "25"
       RATE_LIMIT_PER_MINUTE: "60"
     ports:

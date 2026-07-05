@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"net"
 	"net/http"
 	"net/mail"
-	"net"
 	"os"
 	"os/signal"
 	"strconv"
@@ -132,7 +132,7 @@ func main() {
 
 func loadConfig() (config, error) {
 	port := env("PORT", "8080")
-	timeoutSeconds, err := strconv.Atoi(env("HTTP_TIMEOUT_SECONDS", "120"))
+	timeoutSeconds, err := strconv.Atoi(env("HTTP_TIMEOUT_SECONDS", "30"))
 	if err != nil || timeoutSeconds <= 0 {
 		return config{}, errors.New("HTTP_TIMEOUT_SECONDS must be a positive integer")
 	}
@@ -212,8 +212,7 @@ func (s *server) handleCheck(w http.ResponseWriter, r *http.Request) {
 
 	result, err := s.checkEmail(r.Context(), email, req.Proxy)
 	if err != nil {
-		s.log.Error("reacher request failed", "error", err)
-		writeError(w, http.StatusBadGateway, "email verification backend unavailable")
+		s.writeBackendError(w, err, "email", email)
 		return
 	}
 
@@ -239,18 +238,21 @@ func (s *server) handleBatchCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results := make([]checkResponse, 0, len(req.Emails))
+	emails := make([]string, 0, len(req.Emails))
 	for _, rawEmail := range req.Emails {
 		email := strings.TrimSpace(rawEmail)
 		if err := validateEmail(email); err != nil {
 			writeError(w, http.StatusBadRequest, fmt.Sprintf("%q: %s", rawEmail, err.Error()))
 			return
 		}
+		emails = append(emails, email)
+	}
 
+	results := make([]checkResponse, 0, len(emails))
+	for _, email := range emails {
 		result, err := s.checkEmail(r.Context(), email, req.Proxy)
 		if err != nil {
-			s.log.Error("reacher request failed", "email", email, "error", err)
-			writeError(w, http.StatusBadGateway, "email verification backend unavailable")
+			s.writeBackendError(w, err, "email", email)
 			return
 		}
 
@@ -294,12 +296,30 @@ func (s *server) checkEmail(ctx context.Context, email string, proxy *proxy) (js
 	return json.RawMessage(respBody), nil
 }
 
+func (s *server) writeBackendError(w http.ResponseWriter, err error, attrs ...any) {
+	logAttrs := append(attrs, "error", err)
+	s.log.Error("reacher request failed", logAttrs...)
+	if isTimeoutError(err) {
+		writeError(w, http.StatusGatewayTimeout, "email verification backend timed out")
+		return
+	}
+	writeError(w, http.StatusBadGateway, "email verification backend unavailable")
+}
+
+func isTimeoutError(err error) bool {
+	return errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err)
+}
+
 func validateEmail(email string) error {
 	if email == "" {
 		return errors.New("email is required")
 	}
 	addr, err := mail.ParseAddress(email)
 	if err != nil || addr.Address != email {
+		return errors.New("email must be a valid address")
+	}
+	username, domain, ok := strings.Cut(email, "@")
+	if !ok || username == "" || domain == "" || strings.Contains(domain, "@") {
 		return errors.New("email must be a valid address")
 	}
 	return nil

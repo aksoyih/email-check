@@ -138,6 +138,9 @@ const openAPISpec = `{
           },
           "502": {
             "$ref": "#/components/responses/BackendUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/BackendTimedOut"
           }
         }
       }
@@ -196,6 +199,9 @@ const openAPISpec = `{
           },
           "502": {
             "$ref": "#/components/responses/BackendUnavailable"
+          },
+          "504": {
+            "$ref": "#/components/responses/BackendTimedOut"
           }
         }
       }
@@ -307,6 +313,34 @@ const openAPISpec = `{
               "backendUnavailable": {
                 "value": {
                   "error": "email verification backend unavailable"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BackendTimedOut": {
+        "description": "The Reacher backend did not return before the configured timeout",
+        "headers": {
+          "X-RateLimit-Limit": {
+            "$ref": "#/components/headers/RateLimitLimit"
+          },
+          "X-RateLimit-Remaining": {
+            "$ref": "#/components/headers/RateLimitRemaining"
+          },
+          "X-RateLimit-Reset": {
+            "$ref": "#/components/headers/RateLimitReset"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "examples": {
+              "backendTimedOut": {
+                "value": {
+                  "error": "email verification backend timed out"
                 }
               }
             }
